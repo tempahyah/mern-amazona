@@ -1,3 +1,3 @@
-# AMAZONA E-COMMERCE WEBISITE
+# AMAZONA E-COMMERCE WEBSITE
 
-#This is a website that mirrors the Amazon E-Commerce website
+This is a website that mirrors the Amazon E-Commerce website
