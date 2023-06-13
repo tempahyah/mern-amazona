@@ -7,6 +7,8 @@ import { Store } from '../Store';
 import Axios from 'axios';
 import { getError } from '../util';
 import { Card, Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { usePayPalScriptReducer, PayPalButtons } from '@paypal/react-paypal-js';
+import { toast } from 'react-toastify';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -16,6 +18,14 @@ const reducer = (state, action) => {
       return { ...state, loading: false, order: action.payload, error: '' };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
+    case 'PAY_REQUEST':
+      return { ...state, loadingPay: true };
+    case 'PAY_SUCCESS':
+      return { ...state, loadingPay: false, successPay: true };
+    case 'PAY_FAIL':
+      return { ...state, loadingPay: false };
+    case 'PAY_RESET':
+      return { ...state, loadingPay: false, successPay: false };
     default:
       return state;
   }
@@ -28,11 +38,53 @@ const OrderScreen = () => {
   const { id: orderId } = params;
 
   const { userInfo } = state;
-  const [{ loading, error, order }, dispatch] = useReducer(reducer, {
-    loading: true,
-    order: {},
-    error: '',
-  });
+  const [{ loading, error, order, successPay, loadingPay }, dispatch] =
+    useReducer(reducer, {
+      loading: true,
+      order: {},
+      error: '',
+      successPay: false,
+      loadingPay: false,
+    });
+
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+
+  const createOrder = (data, actions) => {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: { value: order.totalPrice },
+          },
+        ],
+      })
+      .then((orderID) => {
+        return orderID;
+      });
+  };
+  const onApprove = (data, actions) => {
+    return actions.order.capture().then(async function (details) {
+      try {
+        dispatch({ type: 'PAY_REQUEST' });
+        const { data } = await Axios.put(
+          `/api/orders/${order._id}/pay`,
+          details,
+          {
+            headers: { authorization: `Bearer ${userInfo.token}` },
+          }
+        );
+        dispatch({ type: 'PAY_SUCCESS', payload: data });
+        toast.success('Order is Paid');
+      } catch (err) {
+        dispatch({ type: 'PAY_FAIL', payload: getError(err) });
+        toast.error(getError(err));
+      }
+    });
+  };
+
+  const onError = (err) => {
+    toast.error(getError(err));
+  };
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -52,10 +104,31 @@ const OrderScreen = () => {
       return navigate('/login');
     }
 
-    if (!order._id || (order._id && order._id !== orderId)) {
+    if (!order._id || successPay || (order._id && order._id !== orderId)) {
       fetchOrder();
+      if (successPay) {
+        dispatch({ type: 'PAY_RESET' });
+      }
+    } else {
+      const loadPayPalScript = async () => {
+        const { data: clientId } = await Axios.get(`/api/keys/paypal`, {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+
+        paypalDispatch({
+          type: 'resetOptions',
+          value: {
+            'client-id': clientId,
+            currency: 'USD',
+          },
+        });
+
+        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+      };
+
+      loadPayPalScript();
     }
-  }, [userInfo, navigate, order, orderId]);
+  }, [userInfo, navigate, order, orderId, paypalDispatch, successPay]);
 
   return loading ? (
     <LoadingBox></LoadingBox>
@@ -177,6 +250,22 @@ const OrderScreen = () => {
                     </Col>
                   </Row>
                 </ListGroupItem>
+
+                {!order.isPaid && (
+                  <ListGroupItem>
+                    {isPending ? (
+                      <LoadingBox />
+                    ) : (
+                      <PayPalButtons
+                        createOrder={createOrder}
+                        onApprove={onApprove}
+                        onError={onError}
+                      ></PayPalButtons>
+                    )}
+
+                    {loadingPay && <LoadingBox></LoadingBox>}
+                  </ListGroupItem>
+                )}
               </ListGroup>
             </Card.Body>
           </Card>
