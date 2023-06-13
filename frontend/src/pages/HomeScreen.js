@@ -1,5 +1,4 @@
 import { useEffect, useReducer } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
 import { Col, Row } from 'react-bootstrap';

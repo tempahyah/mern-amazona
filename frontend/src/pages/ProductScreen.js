@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import logger from 'use-reducer-logger';
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useReducer } from 'react';
 import LoadingBox from '../components/LoadingBox';
