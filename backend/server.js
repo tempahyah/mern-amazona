@@ -1,12 +1,22 @@
-import express from 'express';
-import path from 'path';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import colors from 'colors';
-import seedRouter from './routes/seedRoutes.js';
-import productRouter from './routes/productRoutes.js';
-import userRouter from './routes/userRoutes.js';
-import orderRouter from './routes/orderRoutes.js';
+// import express from 'express';
+// import path from 'path';
+// import dotenv from 'dotenv';
+// import mongoose from 'mongoose';
+// import colors from 'colors';
+// import seedRouter from './routes/seedRoutes.js';
+// import productRouter from './routes/productRoutes.js';
+// import userRouter from './routes/userRoutes.js';
+// import orderRouter from './routes/orderRoutes.js';
+
+const express = require('express');
+const path = require('path');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const colors = require('colors');
+const seedRouter = require('./routes/seedRoutes.js');
+const productRouter = require('./routes/productRoutes.js');
+const userRouter = require('./routes/userRoutes.js');
+const orderRouter = require('./routes/orderRoutes.js');
 
 dotenv.config();
 
