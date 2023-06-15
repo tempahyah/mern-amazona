@@ -5,7 +5,7 @@ import HomeScreen from './pages/HomeScreen';
 import ProductScreen from './pages/ProductScreen';
 import { Navbar, Container, Nav, Badge, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { Store } from './Store';
 import CartScreen from './pages/CartScreen';
 import SignInScreen from './pages/SignInScreen';
