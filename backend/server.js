@@ -38,7 +38,7 @@ app.get('/api/keys/paypal', (req, res) => {
   res.send(process.env.PAYPAIL_CLIENT_ID || 'sb');
 });
 
-app.use('/api/seed', seedRouter);
+// app.use('/api/seed', seedRouter);
 app.use('/api/products', productRouter);
 app.use('/api/users', userRouter);
 app.use('/api/orders', orderRouter);
