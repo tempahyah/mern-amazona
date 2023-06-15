@@ -1,6 +1,7 @@
 {
   "name": "amazona",
-  "type": "module",
+  // "type": "module",
+  "type": "commonjs",
   "version": "1.0.0",
   "description": "E-Commerce website like Amazon",
   "main": "index.js",
