@@ -1,11 +1,21 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import HomeScreen from './pages/HomeScreen';
 import ProductScreen from './pages/ProductScreen';
-import { Navbar, Container, Nav, Badge, NavDropdown } from 'react-bootstrap';
+import {
+  Navbar,
+  Container,
+  Nav,
+  Badge,
+  NavDropdown,
+  Button,
+  NavItem,
+  NavLink,
+} from 'react-bootstrap';
+import axios from 'axios';
 import { LinkContainer } from 'react-router-bootstrap';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Store } from './Store';
 import CartScreen from './pages/CartScreen';
 import SignInScreen from './pages/SignInScreen';
@@ -16,6 +26,9 @@ import PlaceOrder from './pages/PlaceOrder';
 import OrderScreen from './pages/OrderScreen';
 import OrderHistoryScreen from './pages/OrderHistoryScreen';
 import ProfileScreen from './pages/ProfileScreen';
+import { getError } from './util';
+import SearchBox from './components/SearchBox';
+import SearchScreen from './pages/SearchScreen';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -27,18 +40,47 @@ function App() {
     localStorage.removeItem('paymentMethod');
     window.location.href = '/signin';
   };
+
+  const [sidebarIsOpen, setSideBarIsOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(`/api/products/categories`);
+        setCategories(data);
+      } catch (error) {
+        toast.error(getError(error));
+      }
+    };
+
+    fetchCategories();
+  }, []);
   return (
     <BrowserRouter>
-      <div className="d-flex flex-column site-container">
+      <div
+        className={
+          sidebarIsOpen
+            ? 'd-flex flex-column site-container active-cont'
+            : 'd-flex flex-column site-container'
+        }
+      >
         <ToastContainer position="bottom-center" limit={1} />
         <header>
           <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
+              <Button
+                variant="dark"
+                onClick={() => setSideBarIsOpen(!sidebarIsOpen)}
+              >
+                <i className="fas fa-bars"></i>
+              </Button>
               <LinkContainer to="/">
                 <Navbar.Brand>amazona</Navbar.Brand>
               </LinkContainer>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
+                <SearchBox />
                 <Nav className="me-auto w-100 justify-content-end">
                   <Link to="/cart" className="nav-link">
                     Cart &nbsp;
@@ -79,6 +121,30 @@ function App() {
           </Navbar>
         </header>
 
+        <div
+          className={
+            sidebarIsOpen
+              ? 'active-nav side-navbar d-flex justify-content-between flex-wrap flex-column'
+              : 'side-navbar d-flex justify-content-between flex-wrap flex-column'
+          }
+        >
+          <Nav className="flex-column text-white w-100 p-2">
+            <NavItem>
+              <strong>Categories</strong>
+            </NavItem>
+            {categories.map((category) => (
+              <NavItem key={category}>
+                <LinkContainer
+                  to={{ pathname: '/search', search: `category=${category}` }}
+                  onClick={() => setSideBarIsOpen(false)}
+                >
+                  <NavLink>{category}</NavLink>
+                </LinkContainer>
+              </NavItem>
+            ))}
+          </Nav>
+        </div>
+
         <main>
           <Container className="mt-3">
             <Routes>
@@ -92,6 +158,7 @@ function App() {
               <Route path="/order/:id" element={<OrderScreen />} />
               <Route path="/orderhistory" element={<OrderHistoryScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
+              <Route path="/search" element={<SearchScreen />} />
               <Route path="/" element={<HomeScreen />} />
             </Routes>
           </Container>
