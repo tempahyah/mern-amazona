@@ -29,6 +29,13 @@ import ProfileScreen from './pages/ProfileScreen';
 import { getError } from './util';
 import SearchBox from './components/SearchBox';
 import SearchScreen from './pages/SearchScreen';
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardScreen from './pages/DashboardScreen';
+import AdminRoute from './components/AdminRoute';
+import OrderListScreen from './pages/OrderListScreen';
+import ProductListScreen from './pages/ProductListScreen';
+import UserListScreen from './pages/UserListScreen';
+import UserEditScreen from './pages/UserEditScreen';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -115,6 +122,25 @@ function App() {
                       Sign In
                     </Link>
                   )}
+                  {userInfo && userInfo.isAdmin && (
+                    <NavDropdown title="Admin" id="admin-nav-dropdown">
+                      <LinkContainer to="/admin/dashboard">
+                        <NavDropdown.Item>Dashboard</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/admin/productList">
+                        <NavDropdown.Item>Products</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/admin/orderList">
+                        <NavDropdown.Item>Orders</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/admin/userList">
+                        <NavDropdown.Item>Users</NavDropdown.Item>
+                      </LinkContainer>
+                    </NavDropdown>
+                  )}
                 </Nav>
               </Navbar.Collapse>
             </Container>
@@ -155,10 +181,75 @@ function App() {
               <Route path="/shipping" element={<ShippingAddressScreen />} />
               <Route path="/payment" element={<PaymentMethodScreen />} />
               <Route path="/placeorder" element={<PlaceOrder />} />
-              <Route path="/order/:id" element={<OrderScreen />} />
-              <Route path="/orderhistory" element={<OrderHistoryScreen />} />
-              <Route path="/profile" element={<ProfileScreen />} />
+              <Route
+                path="/order/:id"
+                element={
+                  <ProtectedRoute>
+                    <OrderScreen />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/orderhistory"
+                element={
+                  <ProtectedRoute>
+                    <OrderHistoryScreen />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfileScreen />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/search" element={<SearchScreen />} />
+
+              {/* Admin Routes  */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <AdminRoute>
+                    <DashboardScreen />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/orderList"
+                element={
+                  <AdminRoute>
+                    <OrderListScreen />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/productList"
+                element={
+                  <AdminRoute>
+                    <ProductListScreen />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/userList"
+                element={
+                  <AdminRoute>
+                    <UserListScreen />
+                  </AdminRoute>
+                }
+              />
+
+              <Route
+                path="/admin/user/:id"
+                element={
+                  <AdminRoute>
+                    <UserEditScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+
               <Route path="/" element={<HomeScreen />} />
             </Routes>
           </Container>
