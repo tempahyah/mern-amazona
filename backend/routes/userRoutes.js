@@ -61,6 +61,7 @@ userRouter.post(
   '/forget-password',
   expressAsyncHandler(async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
+    console.log(user);
 
     if (user) {
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
@@ -76,7 +77,7 @@ userRouter.post(
         .messages()
         .send(
           {
-            from: 'Amazona <me@mg.yourdomain.com>',
+            from: 'Amazona <me@mg.ymcodexdevs.com>',
             to: `${user.name} <${user.email}>`,
             subject: `Reset Password`,
             html: ` 

@@ -36,6 +36,7 @@ import OrderListScreen from './pages/OrderListScreen';
 import ProductListScreen from './pages/ProductListScreen';
 import UserListScreen from './pages/UserListScreen';
 import UserEditScreen from './pages/UserEditScreen';
+import ForgetPasswordScreen from './pages/ForgetPasswordScreen';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -206,6 +207,10 @@ function App() {
                 }
               />
               <Route path="/search" element={<SearchScreen />} />
+              <Route
+                path="/forget-password"
+                element={<ForgetPasswordScreen />}
+              />
 
               {/* Admin Routes  */}
               <Route
